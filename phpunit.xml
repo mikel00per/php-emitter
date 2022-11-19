@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
         cacheResult="false"
         colors="true"
         backupGlobals="false"
@@ -16,7 +18,7 @@
         </testsuite>
     </testsuites>
 
-  <coverage processUncoveredFiles="false">
+  <coverage>
     <include>
       <directory suffix=".php">src</directory>
     </include>
@@ -28,7 +30,7 @@
         </exclude>
 
         <report>
-            <html outputDirectory="tmp/coverage-html" lowUpperBound="50" highLowerBound="90"/>
+            <html outputDirectory="tmp/coverage-html"/>
         </report>
 
     </coverage>
