@@ -1,31 +1,29 @@
 {
-    "name": "mikelooper/php-library-template",
+    "name": "mikelooper/php-emitter",
+    "description": "Emitting of PSR-7 Response implementation",
+    "keywords": ["php", "http", "http-emitter", "emitter", "psr-7", "http-message"],
+    "homepage": "https://github.com/mikel00per/php-emitter",
     "type": "library",
-    "description": "A template to create libraries",
-    "keywords": ["library"],
-    "homepage": "https://github.com/mikel00per/php-library-template",
     "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "PhpLibraryTemplate\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "PhpLibraryTemplate\\Tests\\": "tests/"
-        },
-        "classmap": [
-            "src/"
-        ]
-    },
     "authors": [
         {
             "name": "Miguel Morillo",
             "email": "miguelmwilliams@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Emitter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Emitter\\Tests\\": "tests/"
+        }
+    },
     "require": {
-        "php": "^8.0"
+        "php": "^8.0",
+        "psr/http-message": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",

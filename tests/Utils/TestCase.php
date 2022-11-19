@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpLibraryTemplate\Tests\Utils;
+namespace Emitter\Tests\Utils;
 
 use PHPUnit\Framework\TestCase as UnitTestCase;
 
