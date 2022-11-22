@@ -1,6 +1,6 @@
-# PHP library template
+# PHP Response emitter
 
-Template to make libraries in PHP
+Emitting of PSR-7 Response implementation
 
 ## Make commands
 
