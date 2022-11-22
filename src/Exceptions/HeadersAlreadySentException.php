@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Emitter\Exceptions;
+namespace ResponseEmitter\Exceptions;
 
-use JetBrains\PhpStorm\Pure;
 use RuntimeException;
 
 class HeadersAlreadySentException extends RuntimeException

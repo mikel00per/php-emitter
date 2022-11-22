@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Emitter;
+namespace ResponseEmitter;
 
-use Emitter\Exceptions\HeadersAlreadySentException;
-use Emitter\Exceptions\OutputAlreadySentException;
+use ResponseEmitter\Exceptions\HeadersAlreadySentException;
+use ResponseEmitter\Exceptions\OutputAlreadySentException;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
