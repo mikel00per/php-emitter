@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Emitter;
+namespace ResponseEmitter;
 
-use Emitter\Tests\Utils\MockData;
+use ResponseEmitter\Tests\Utils\MockData;
 
 use function array_key_exists;
 use function explode;
@@ -16,10 +16,6 @@ use function strtolower;
 if (!function_exists(__NAMESPACE__ . '\\header')) {
     /**
      * Mock for the `header()` function.
-     *
-     * @param string $string
-     * @param bool $replace
-     * @param int|null $http_response_code
      */
     function header(string $string, bool $replace = true, int $http_response_code = null): void
     {
@@ -46,8 +42,6 @@ if (!function_exists(__NAMESPACE__ . '\\header')) {
 if (!function_exists(__NAMESPACE__ . '\\header_remove')) {
     /**
      * Mock for the `header_remove()` function.
-     *
-     * @param string|null $header
      */
     function header_remove(string $header = null): void
     {
@@ -63,8 +57,6 @@ if (!function_exists(__NAMESPACE__ . '\\header_remove')) {
 if (!function_exists(__NAMESPACE__ . '\\headers_sent')) {
     /**
      * Mock for the `headers_sent()` function.
-     *
-     * @return bool
      */
     function headers_sent(): bool
     {
@@ -95,9 +87,6 @@ if (!function_exists(__NAMESPACE__ . '\\headers_list')) {
 if (!function_exists(__NAMESPACE__ . '\\http_response_code')) {
     /**
      * Mock for the `http_response_code()` function.
-     *
-     * @param int|null $response_code
-     * @return int
      */
     function http_response_code(int $response_code = null): int
     {
@@ -112,9 +101,6 @@ if (!function_exists(__NAMESPACE__ . '\\http_response_code')) {
 if (!function_exists(__NAMESPACE__ . '\\http_response_status_line')) {
     /**
      * Gets or Sets the HTTP response status line.
-     *
-     * @param string|null $response_status_line
-     * @return string
      */
     function http_response_status_line(string $response_status_line = null): string
     {

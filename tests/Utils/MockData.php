@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Emitter\Tests\Utils;
+namespace ResponseEmitter\Tests\Utils;
 
 class MockData
 {
