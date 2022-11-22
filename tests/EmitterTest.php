@@ -1,21 +1,23 @@
 <?php
 
-namespace Emitter\Tests;
+namespace ResponseEmitter\Tests;
 
-use Emitter\Emitter;
-use Emitter\EmitterInterface;
-use Emitter\Exceptions\HeadersAlreadySentException;
-use Emitter\Exceptions\OutputAlreadySentException;
-use Emitter\Tests\Utils\MockData;
-use Emitter\Tests\Utils\TestCase;
-use HttpSoft\Message\Response;
+use ResponseEmitter\Emitter;
+use ResponseEmitter\EmitterInterface;
+use ResponseEmitter\Exceptions\HeadersAlreadySentException;
+use ResponseEmitter\Exceptions\OutputAlreadySentException;
+use ResponseEmitter\Tests\Utils\MockData;
+use ResponseEmitter\Tests\Utils\TestCase;
+use Fig\Http\Message\ReasonPhrasesInterface;
+use Fig\Http\Message\StatusCodeInterface;
 use InvalidArgumentException;
+use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
-use function Emitter\header;
-use function Emitter\headers_list;
-use function Emitter\http_response_code;
-use function Emitter\http_response_status_line;
+use function ResponseEmitter\header;
+use function ResponseEmitter\headers_list;
+use function ResponseEmitter\http_response_code;
+use function ResponseEmitter\http_response_status_line;
 
 class EmitterTest extends TestCase
 {
@@ -31,7 +33,7 @@ class EmitterTest extends TestCase
         $response = $this->createResponse();
         (new Emitter())->emit($response);
 
-        $this->assertSame(200, http_response_code());
+        $this->assertSame(StatusCodeInterface::STATUS_OK, http_response_code());
         $this->assertCount(0, headers_list());
         $this->assertSame([], headers_list());
         $this->assertSame('HTTP/1.1 200 OK', http_response_status_line());
@@ -40,7 +42,12 @@ class EmitterTest extends TestCase
 
     public function testEmitWithSpecifyArguments(): void
     {
-        $response = $this->createResponse($code = 404, ['X-Test' => 'test'], $contents = 'Page not found', '2');
+        $response = $this->createResponse(
+            $code = StatusCodeInterface::STATUS_NOT_FOUND,
+            ['X-Test' => 'test'],
+            $contents = 'Page not found',
+            '2'
+        );
         (new Emitter())->emit($response);
 
         $this->assertSame($code, http_response_code());
@@ -51,7 +58,11 @@ class EmitterTest extends TestCase
     }
     public function testEmitDuplicateHeadersNotReplaced(): void
     {
-        $response = $this->createResponse($code = 200, ['X-Test' => 'test-1'], $contents = 'Contents')
+        $response = $this->createResponse(
+            $code = StatusCodeInterface::STATUS_OK,
+            ['X-Test' => 'test-1'],
+            $contents = 'Contents'
+        )
             ->withAddedHeader('X-Test', 'test-2')
             ->withAddedHeader('X-Test', 'test-3')
             ->withAddedHeader('Set-Cookie', 'key-1=value-1')
@@ -86,7 +97,7 @@ class EmitterTest extends TestCase
         $response = $this->createResponse();
         $emitter->emit($response);
 
-        $this->assertSame(200, http_response_code());
+        $this->assertSame(StatusCodeInterface::STATUS_OK, http_response_code());
         $this->assertCount(0, headers_list());
         $this->assertSame([], headers_list());
         $this->assertSame('HTTP/1.1 200 OK', http_response_status_line());
@@ -96,7 +107,12 @@ class EmitterTest extends TestCase
     public function testEmitWithBufferLengthAndSpecifyArguments(): void
     {
         $emitter = new Emitter(2);
-        $response = $this->createResponse($code = 404, ['X-Test' => 'test'], $contents = 'Page not found', '2');
+        $response = $this->createResponse(
+            $code = StatusCodeInterface::STATUS_NOT_FOUND,
+            ['X-Test' => 'test'],
+            $contents = 'Page not found',
+            '2'
+        );
         $emitter->emit($response);
 
         $this->assertSame($code, http_response_code());
@@ -109,7 +125,11 @@ class EmitterTest extends TestCase
     public function testEmitWithBufferLengthAndContentRangeHeader(): void
     {
         $emitter = new Emitter(1);
-        $response = $this->createResponse($code = 200, ['Content-Range' => 'bytes 0-3/8'], 'Contents');
+        $response = $this->createResponse(
+            $code = StatusCodeInterface::STATUS_OK,
+            ['Content-Range' => 'bytes 0-3/8'],
+            'Contents'
+        );
         $emitter->emit($response);
 
         $this->assertSame($code, http_response_code());
@@ -122,7 +142,12 @@ class EmitterTest extends TestCase
     public function testEmitWithoutBodyTrue(): void
     {
         $emitter = new Emitter();
-        $response = $this->createResponse($code = 404, ['X-Test' => 'test'], 'Page not found', '2');
+        $response = $this->createResponse(
+            $code = StatusCodeInterface::STATUS_NOT_FOUND,
+            ['X-Test' => 'test'],
+            'Page not found',
+            '2'
+        );
         $emitter->emit($response, true);
 
         $this->assertSame($code, http_response_code());
@@ -135,7 +160,11 @@ class EmitterTest extends TestCase
     public function testEmitWithoutBodyTrueAndWithBufferLengthAndContentRangeHeader(): void
     {
         $emitter = new Emitter(1);
-        $response = $this->createResponse($code = 200, ['Content-Range' => 'bytes 0-3/8'], 'Contents');
+        $response = $this->createResponse(
+            $code = StatusCodeInterface::STATUS_OK,
+            ['Content-Range' => 'bytes 0-3/8'],
+            'Contents'
+        );
         $emitter->emit($response, true);
 
         $this->assertSame($code, http_response_code());
@@ -147,7 +176,14 @@ class EmitterTest extends TestCase
 
     public function testEmitBodyWithNotReadableStream(): void
     {
-        $response = new Response(200, [], fopen('php://output', 'c'));
+        $code = StatusCodeInterface::STATUS_OK;
+
+        $response = new Response(
+            $code,
+            [],
+            fopen('php://output', 'c'),
+            ReasonPhrasesInterface::REASON_PHRASES[$code]
+        );
         $this->assertSame('php://output', $response->getBody()->getMetadata('uri'));
         $this->assertFalse($response->getBody()->isReadable());
 
@@ -167,7 +203,14 @@ class EmitterTest extends TestCase
 
     public function testEmitThrowOutputAlreadySentException(): void
     {
-        $response = new Response(200, [], fopen('php://output', 'c'));
+        $code = StatusCodeInterface::STATUS_OK;
+
+        $response = new Response(
+            $code,
+            $headers = [],
+            fopen('php://output', 'cb'),
+            ReasonPhrasesInterface::REASON_PHRASES[$code]
+        );
         $response->getBody()->write('Contents');
         $this->expectOutputString('Contents');
 
@@ -220,7 +263,7 @@ class EmitterTest extends TestCase
         $headers = $isContentRange ? ['Content-Range' => "bytes $first-$last/*"] : [];
         $expectedHeaders = $isContentRange ? ["Content-Range: bytes $first-$last/*"] : [];
 
-        $response = $this->createResponse(200, $headers, $contents);
+        $response = $this->createResponse(StatusCodeInterface::STATUS_OK, $headers, $contents);
         $emitter = $this->createEmitterMock($response, $buffer);
         $emitter->emit($response);
 
